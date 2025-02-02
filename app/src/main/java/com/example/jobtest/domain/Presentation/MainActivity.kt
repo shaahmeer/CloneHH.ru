@@ -36,13 +36,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize the repository
         repository = RepositoryImpl(RemoteDatasource(RetrofitInstance.fileDownloadService))
 
-        // Use ViewModelFactory to initialize SharedViewModel
         sharedViewModel = ViewModelProvider(this, SharedViewModelFactory(repository, mainViewModel)).get(SharedViewModel::class.java)
 
-        // Initialize Fragments
+
         jobFragment = JobFragment()
         favJobFragment = FavoriteVacanciesFragment()
         activeFragment = jobFragment

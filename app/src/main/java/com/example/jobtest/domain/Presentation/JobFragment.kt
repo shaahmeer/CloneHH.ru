@@ -81,7 +81,7 @@ class JobFragment : Fragment() {
 
     private fun setupAdapters() {
         jobAdapter = VacancyAdapter(emptyList(), ::onFavoriteClick, ::onApplyClick)
-        offerAdapter = HorizontalAdapter()
+        offerAdapter = HorizontalAdapter(emptyList())
     }
 
     private fun setupRecyclerViews() {
@@ -102,12 +102,12 @@ class JobFragment : Fragment() {
         }
 
         sharedViewModel.filteredJobs.observe(viewLifecycleOwner) { filteredVacancies ->
-            jobAdapter.updateData(filteredVacancies) // Update UI with filtered vacancies
+            jobAdapter.updateData(filteredVacancies)
 
         }
 
         sharedViewModel.offers.observe(viewLifecycleOwner) { offers ->
-            offerAdapter.submitList(offers)  // Update the offer adapter with fetched offers
+            offerAdapter.updateData(offers)
         }
 
 

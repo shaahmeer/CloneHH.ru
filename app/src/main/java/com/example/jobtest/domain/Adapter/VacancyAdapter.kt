@@ -11,9 +11,9 @@ import com.example.jobtest.domain.Presentation.Jobdetails
 import com.example.jobtest.domain.viewmodel.SharedViewModel
 
 class VacancyAdapter(
-    var vacancy: List<Vacancy>,  // Use a mutable list so it can be updated dynamically
-    private val onFavoriteClick: (Vacancy) -> Unit,  // Callback for when a favorite is clicked
-    private val onItemClick: (Vacancy) -> Unit,  // Callback for item click
+    var vacancy: List<Vacancy>,
+    private val onFavoriteClick: (Vacancy) -> Unit,
+    private val onItemClick: (Vacancy) -> Unit,
 ) : RecyclerView.Adapter<VacancyAdapter.VacancyViewHolder>() {
 
     inner class VacancyViewHolder(private val binding: ItemVacancyBinding) :
@@ -84,7 +84,7 @@ class VacancyAdapter(
     override fun getItemCount(): Int = vacancy.size
 
     fun updateData(newJobs: List<Vacancy>) {
-        vacancy = newJobs.toMutableList()  // Ensure the list is mutable
+        vacancy = newJobs.toMutableList()
         notifyDataSetChanged()
     }
 }

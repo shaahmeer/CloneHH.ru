@@ -34,7 +34,6 @@ class FavoriteVacanciesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up RecyclerView
         binding.favRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = favJobAdapter
@@ -44,7 +43,6 @@ class FavoriteVacanciesFragment : Fragment() {
         }
 
 
-        // Observe favoriteJobs and update RecyclerView and badge
         sharedViewModel.favoriteVacancies.observe(viewLifecycleOwner) { favoriteJobs ->
             if (favoriteJobs != null) {
                 favJobAdapter.updateData(favoriteJobs)
@@ -60,15 +58,15 @@ class FavoriteVacanciesFragment : Fragment() {
         val badge = bottomNavigationView.getOrCreateBadge(menuItem.itemId) // Get or create a badge
         if (favoriteCount > 0) {
             badge.isVisible = true
-            badge.number = favoriteCount // Set the count
+            badge.number = favoriteCount
         } else {
-            badge.isVisible = false // Hide the badge if no favorites
+            badge.isVisible = false
         }
     }
 
     private fun onFavoriteClick(position: Int) {
         val job = favJobAdapter.jobs[position]
-        sharedViewModel.toggleFavorite(job) // Toggle favorite status in ViewModel
+        sharedViewModel.toggleFavorite(job)
     }
 
     private fun onApplyClick(position: Int) {
@@ -79,7 +77,7 @@ class FavoriteVacanciesFragment : Fragment() {
 
     private fun onRemoveFavoriteClick(position: Int) {
         val job = favJobAdapter.jobs[position]
-        sharedViewModel.removeFavoriteJob(job) // Remove from favorites in ViewModel
+        sharedViewModel.removeFavoriteJob(job)
     }
 
     override fun onDestroyView() {
