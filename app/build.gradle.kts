@@ -1,6 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+
+
+
+
+
+
 }
 
 android {
@@ -41,32 +49,35 @@ android {
 dependencies {
 
 
-
-
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
 
-        implementation(libs.retrofit)
-        implementation(libs.converter.gson)
-        implementation(libs.logging.interceptor)
-        implementation(libs.androidx.lifecycle.livedata.ktx)
-        implementation(libs.androidx.lifecycle.viewmodel.ktx)
-        implementation(libs.androidx.fragment.ktx)
-        implementation(libs.androidx.navigation.fragment.ktx)
-        implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
-        implementation(libs.hilt.android)
-        implementation(libs.androidx.hilt.lifecycle.viewmodel)
-        implementation(libs.androidx.hilt.navigation.fragment)
-
-
+    implementation ("androidx.hilt:hilt-navigation-fragment:1.0.0")
+    implementation ("com.google.dagger:hilt-android:2.51.1")
+    kapt ("com.google.dagger:hilt-android-compiler:2.51.1")
 }
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
+}
+
+
+
+

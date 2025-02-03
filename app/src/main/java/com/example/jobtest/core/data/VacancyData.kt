@@ -9,7 +9,7 @@ data class Offer(
     val id: String,
     val title: String,
     val link: String,
-    val buttonText: String? = null  // Changed from Button to String
+    val buttonText: String? = null
 )
 
 data class Vacancy(
@@ -25,7 +25,7 @@ data class Vacancy(
     val salary: Salary,
     val schedules: List<String>,
     val appliedNumber: Int? = null,
-    val description: String,
+    val description: String?,
     val responsibilities: String,
     val questions: List<String>
 )

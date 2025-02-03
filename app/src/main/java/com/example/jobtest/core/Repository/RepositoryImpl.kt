@@ -9,14 +9,16 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Response
+import javax.inject.Inject
 
-class RepositoryImpl(private val remoteDatasource: RemoteDatasource) : Repository {
+class RepositoryImpl @Inject constructor(
+    private val remoteDatasource: RemoteDatasource
+) : Repository {
 
-    // Fetch Vacancies
+
     override suspend fun getVacancies(): List<Vacancy> {
         try {
             val response = remoteDatasource.fetchVacancies()  // Fetch the response
-            // If response is successful, parse the body into a list of Vacancies
             return parseVacancyResponse(response)
         } catch (e: Exception) {
             Log.e("Repository", "Error fetching vacancies: ${e.message}")
@@ -24,11 +26,10 @@ class RepositoryImpl(private val remoteDatasource: RemoteDatasource) : Repositor
         }
     }
 
-    // Fetch Offers
+
     override suspend fun getOffer(): List<Offer> {
         try {
             val response = remoteDatasource.fetchOffers()  // Fetch the response
-            // If response is successful, parse the body into a list of Offers
             return parseOfferResponse(response)
         } catch (e: Exception) {
             Log.e("Repository", "Error fetching offers: ${e.message}")
@@ -36,12 +37,11 @@ class RepositoryImpl(private val remoteDatasource: RemoteDatasource) : Repositor
         }
     }
 
-    // Parse the response for Vacancies
+
     private fun parseVacancyResponse(response: Response<ResponseBody>): List<Vacancy> {
         return if (response.isSuccessful) {
             try {
                 val responseBody = response.body()?.string()
-                // Assuming the response is an object with a "vacancies" field
                 val jsonObject = JSONObject(responseBody)
                 val vacanciesJsonArray = jsonObject.optJSONArray("vacancies")
 
@@ -59,16 +59,15 @@ class RepositoryImpl(private val remoteDatasource: RemoteDatasource) : Repositor
         }
     }
 
-    // Parse the response for Offers (similar to Vacancies)
+
     private fun parseOfferResponse(response: Response<ResponseBody>): List<Offer> {
         return if (response.isSuccessful) {
             try {
                 val responseBody = response.body()?.string()
-                // Assuming the response is an object with an "offers" field
                 val jsonObject = JSONObject(responseBody)
                 val offersJsonArray = jsonObject.optJSONArray("offers")
 
-                // Convert the JSON array into a list of Offer objects
+
                 val listType = object : TypeToken<List<Offer>>() {}.type
                 return Gson().fromJson(offersJsonArray?.toString(), listType) ?: emptyList()
 

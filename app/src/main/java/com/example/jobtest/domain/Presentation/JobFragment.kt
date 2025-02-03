@@ -8,47 +8,39 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobtest.core.Repository.Repository
-import com.example.jobtest.core.Repository.RepositoryImpl
 import com.example.jobtest.core.data.Vacancy
-import com.example.jobtest.core.datasource.FileDownloadService
-import com.example.jobtest.core.datasource.RemoteDatasource
-import com.example.jobtest.core.network.RetrofitInstance
 import com.example.jobtest.databinding.FragmentJobBinding
 import com.example.jobtest.domain.Adapter.HorizontalAdapter
 import com.example.jobtest.domain.Adapter.VacancyAdapter
-import com.example.jobtest.domain.viewmodel.SharedViewModelFactory
-import com.example.jobtest.domain.viewmodel.SharedViewModel
 import com.example.jobtest.domain.viewmodel.MainViewModel
+import com.example.jobtest.domain.viewmodel.SharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@AndroidEntryPoint
 
 class JobFragment : Fragment() {
+
+    @Inject
+    lateinit var repository: Repository
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     private var _binding: FragmentJobBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var jobAdapter: VacancyAdapter
     private lateinit var offerAdapter: HorizontalAdapter
 
-    // Initialize repository before passing it to SharedViewModelFactory
-    private val repository = RepositoryImpl(
-        RemoteDatasource(RetrofitInstance.fileDownloadService) // Pass the Retrofit service
-    )
-
-    // Get the MainViewModel
-    private val mainViewModel: MainViewModel by activityViewModels()
-
-    // Initialize SharedViewModel using the ViewModelFactory
-    private val sharedViewModel: SharedViewModel by activityViewModels {
-        SharedViewModelFactory(repository, mainViewModel) // Ensure the factory is used correctly
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentJobBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -58,6 +50,7 @@ class JobFragment : Fragment() {
         setupAdapters()
         setupRecyclerViews()
         observeViewModel()
+
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let { sharedViewModel.filterJobs(it) }
@@ -70,13 +63,8 @@ class JobFragment : Fragment() {
             }
         })
 
-        // Load jobs from API if the list is empty
-        if (sharedViewModel.allJobs.value.isNullOrEmpty()) {
-            sharedViewModel.loadVacancies()
-        }
-        if (sharedViewModel.offers.value.isNullOrEmpty()) {
-            sharedViewModel.loadOffers()  // Fetch offers
-        }
+        sharedViewModel.loadVacancies()
+        sharedViewModel.loadOffers()
     }
 
     private fun setupAdapters() {
@@ -97,20 +85,17 @@ class JobFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        sharedViewModel.allJobs.observe(viewLifecycleOwner) { vacancies ->
-            jobAdapter.updateData(vacancies) // Update UI with API data
-        }
-
         sharedViewModel.filteredJobs.observe(viewLifecycleOwner) { filteredVacancies ->
             jobAdapter.updateData(filteredVacancies)
-
         }
 
         sharedViewModel.offers.observe(viewLifecycleOwner) { offers ->
             offerAdapter.updateData(offers)
         }
 
-
+//        sharedViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+//            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+//        }
     }
 
     private fun onFavoriteClick(vacancy: Vacancy) {
