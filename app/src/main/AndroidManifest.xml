@@ -12,7 +12,7 @@
         android:maxSdkVersion="28" />
 
     <application
-        android:name=".domain.hilt.MyApp"
+        android:name="com.example.jobtest.hilt.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,11 +24,11 @@
         android:theme="@style/Theme.JobTest"
         tools:targetApi="31">
         <activity
-            android:name=".domain.Presentation.Jobdetails"
+            android:name=".presentation.ui.Jobdetails"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".domain.Presentation.MainActivity"
+            android:name=".presentation.ui.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait" >
             <intent-filter>

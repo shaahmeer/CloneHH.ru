@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/jobFragment"
-        android:name="com.example.jobtest.domain.Presentation.JobFragment"
+        android:name="com.example.jobtest.presentation.ui.JobFragment"
         android:label="Job Fragment"
         tools:layout="@layout/fragment_job">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/favoriteVacanciesFragment"
-        android:name="com.example.jobtest.domain.Presentation.FavoriteVacanciesFragment"
+        android:name="com.example.jobtest.presentation.ui.FavoriteVacanciesFragment"
         android:label="Favorite Vacancies Fragment"
         tools:layout="@layout/fragment_favorite_vacancies" />
 </navigation>

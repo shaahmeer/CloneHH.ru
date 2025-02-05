@@ -23,4 +23,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "JobTest"
 include(":app")
- 
+include(":app:core")
+include(":app:domain")
