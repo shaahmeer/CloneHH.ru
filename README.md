@@ -1,13 +1,13 @@
 Android:
-Kotlin 
-Coroutine 
-﻿Flow 
-﻿﻿HILT
-﻿﻿MVVM
-﻿﻿AdapterDelegates
-The layout is simple in XML
-Clean Architecture
-Multi-modularity
+Kotlin, 
+Coroutine, 
+﻿Flow ,
+﻿﻿HILT,
+﻿﻿MVVM,
+﻿﻿AdapterDelegates,
+The layout is simple in XML,
+Clean Architecture,
+Multi-modularity,
 Retrofit
 
 <img width="381" alt="Screenshot 2025-02-03 at 00 22 26" src="https://github.com/user-attachments/assets/f2ef9c86-302a-4718-b6b4-6c8ecde426ab" />
