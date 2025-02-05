@@ -1,31 +1,19 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
-
-
-
-
-
-
 }
 
 android {
-    namespace = "com.example.jobtest"
+    namespace = "com.example.domain"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.jobtest"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    buildFeatures{
-        viewBinding = true
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -48,18 +36,13 @@ android {
 
 dependencies {
 
-    implementation (project(":app:core"))
-    implementation (project(":app:domain"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.google.material.v1110)
+    implementation(project(":app:core"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
@@ -76,14 +59,4 @@ dependencies {
     implementation ("com.google.dagger:hilt-android:2.51.1")
     kapt ("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-
 }
-
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
-}
-
-
-
-
