@@ -10,23 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.domain.domain.Repository.Repository
 import com.example.core.core.data.Vacancy
 import com.example.jobtest.databinding.FragmentJobBinding
 import com.example.jobtest.adapter.HorizontalAdapter
 import com.example.jobtest.adapter.VacancyAdapter
-import com.example.jobtest.presentation.viewmodel.MainViewModel
 import com.example.jobtest.presentation.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class JobFragment : Fragment() {
-
-    @Inject
-    lateinit var repository: com.example.domain.domain.Repository.Repository
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
@@ -51,24 +44,31 @@ class JobFragment : Fragment() {
         setupRecyclerViews()
         observeViewModel()
 
+        // Set up SearchView listener
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { sharedViewModel.filterJobs(it) }
+                query?.let { sharedViewModel.updateSearchQuery(it) }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                sharedViewModel.filterJobs(newText ?: "")
+                sharedViewModel.updateSearchQuery(newText ?: "")
                 return true
             }
         })
 
+        // Load data
         sharedViewModel.loadVacancies()
         sharedViewModel.loadOffers()
     }
 
     private fun setupAdapters() {
-        jobAdapter = VacancyAdapter(emptyList(), ::onFavoriteClick, ::onApplyClick)
+        jobAdapter = VacancyAdapter(
+            vacancies = emptyList(),
+            viewModel = sharedViewModel,
+            onFavoriteClick = ::onFavoriteClick,
+            onApplyClick = ::onApplyClick
+        )
         offerAdapter = HorizontalAdapter(emptyList())
     }
 
@@ -97,7 +97,7 @@ class JobFragment : Fragment() {
             }
         }
 
-        // If you have an isLoading state, you can collect it similarly
+        // Observe isLoading state (optional)
         /*lifecycleScope.launch {
             sharedViewModel.isLoading.collect { isLoading ->
                 binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE

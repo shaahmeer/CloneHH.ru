@@ -1,17 +1,18 @@
 package com.example.jobtest.adapter
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.core.core.data.Vacancy
 import com.example.jobtest.databinding.ItemVacancyBinding
-import com.example.jobtest.presentation.ui.Jobdetails
+import com.example.jobtest.presentation.viewmodel.SharedViewModel
+
 
 class VacancyAdapter(
-    var vacancy: List<Vacancy>,
+    private var vacancies: List<Vacancy>,
+    private val viewModel: SharedViewModel, // Pass ViewModel to Adapter
     private val onFavoriteClick: (Vacancy) -> Unit,
-    private val onItemClick: (Vacancy) -> Unit,
+    private val onApplyClick: (Vacancy) -> Unit
 ) : RecyclerView.Adapter<VacancyAdapter.VacancyViewHolder>() {
 
     inner class VacancyViewHolder(private val binding: ItemVacancyBinding) :
@@ -19,55 +20,19 @@ class VacancyAdapter(
 
         fun bind(vacancy: Vacancy) {
             binding.apply {
-                // Bind Vacancy data to UI components
                 tvJobTitle.text = vacancy.title
                 tvSalary.text = vacancy.salary.full
-                tvLocation.text =
-                    "${vacancy.address.town}, ${vacancy.address.street}, ${vacancy.address.house}"
+                tvLocation.text = "${vacancy.address.town}, ${vacancy.address.street}, ${vacancy.address.house}"
                 tvCompanyName.text = vacancy.company
                 tvExperience.text = vacancy.experience.previewText
                 tvPublishDate.text = vacancy.publishedDate
 
+                btnFavorite.setColorFilter(viewModel.getFavoriteColor(vacancy))
 
-
-                btnFavorite.setColorFilter(
-                    if (vacancy.isFavorite) android.graphics.Color.RED else android.graphics.Color.GRAY
-                )
-
-                binding.btnFavorite.setOnClickListener {
-                    onFavoriteClick(vacancy)
-                }
-                btnApply.setOnClickListener {
-                    val intent = Intent(itemView.context, Jobdetails::class.java).apply {
-                        putExtra("jobTitle", vacancy.title)
-                        putExtra(
-                            "location",
-                            "${vacancy.address.street}, ${vacancy.address.house}, ${vacancy.address.town}"
-                        )
-                        putExtra("companyName", vacancy.company)
-                        putExtra("experience", vacancy.experience.previewText)
-                        putExtra("publishDate", vacancy.publishedDate)
-                        putExtra("viewersCount", vacancy.lookingNumber.toString())
-                        putExtra("isFavorite", vacancy.isFavorite)
-                        putExtra("salary", vacancy.salary.full)
-                        putExtra(
-                            "schedules",
-                            ArrayList(vacancy.schedules)
-                        ) // Assuming schedules is a List
-                        putExtra("appliedNumber", "человек сейчас смотрят ${vacancy.appliedNumber.toString()} ")
-                        putExtra("description", vacancy.description)
-                        putExtra("responsibilities", vacancy.responsibilities)
-                        putExtra(
-                            "questions",
-                            ArrayList(vacancy.questions)
-                        ) // Assuming questions is a List
-                    }
-                    itemView.context.startActivity(intent)
-                }
+                btnFavorite.setOnClickListener { onFavoriteClick(vacancy) }
+                btnApply.setOnClickListener { onApplyClick(vacancy) }
             }
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VacancyViewHolder {
@@ -76,13 +41,13 @@ class VacancyAdapter(
     }
 
     override fun onBindViewHolder(holder: VacancyViewHolder, position: Int) {
-        holder.bind(vacancy[position])
+        holder.bind(vacancies[position])
     }
 
-    override fun getItemCount(): Int = vacancy.size
+    override fun getItemCount(): Int = vacancies.size
 
-    fun updateData(newJobs: List<Vacancy>) {
-        vacancy = newJobs.toMutableList()
+    fun updateData(newVacancies: List<Vacancy>) {
+        vacancies = newVacancies
         notifyDataSetChanged()
     }
 }

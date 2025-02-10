@@ -1,11 +1,9 @@
 package com.example.jobtest.presentation.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,15 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobtest.R
 import com.example.jobtest.databinding.FragmentFavoriteVacanciesBinding
 import com.example.jobtest.adapter.FavJobAdapter
-import com.example.jobtest.presentation.viewmodel.SharedViewModel
+import com.example.jobtest.presentation.viewmodel.FavoriteVacanciesViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class FavoriteVacanciesFragment : Fragment() {
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val favoriteVacanciesViewModel: FavoriteVacanciesViewModel by activityViewModels()
     private var _binding: FragmentFavoriteVacanciesBinding? = null
     private val binding get() = _binding!!
 
@@ -31,6 +27,7 @@ class FavoriteVacanciesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Use ViewBinding to inflate the layout
         _binding = FragmentFavoriteVacanciesBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -38,18 +35,21 @@ class FavoriteVacanciesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize RecyclerView
         setupRecyclerView()
+
+        // Observe favorite jobs from ViewModel
         observeFavoriteJobs()
     }
 
     private fun setupRecyclerView() {
+        // Initialize the adapter with ViewModel
         favJobAdapter = FavJobAdapter(
             jobs = emptyList(),
-            onFavoriteClick = ::onFavoriteClick,
-            onApplyClick = ::onApplyClick,
-            onRemoveFavoriteClick = ::onRemoveFavoriteClick
+            viewModel = favoriteVacanciesViewModel
         )
 
+        // Setup RecyclerView with the adapter and layout manager
         binding.favRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = favJobAdapter
@@ -58,20 +58,15 @@ class FavoriteVacanciesFragment : Fragment() {
 
     private fun observeFavoriteJobs() {
         lifecycleScope.launch {
-            sharedViewModel.favoriteVacancies.collect { favoriteJobs ->
-
-
+            // Observe changes in the favorite jobs list
+            favoriteVacanciesViewModel.favoriteVacancies.collect { favoriteJobs ->
+                // Update the data in the adapter
                 favJobAdapter.updateData(favoriteJobs)
 
                 // Handle empty list view
-                if (favoriteJobs.isEmpty()) {
+                binding.favRecyclerView.visibility = if (favoriteJobs.isEmpty()) View.GONE else View.VISIBLE
 
-                    binding.favRecyclerView.visibility = View.GONE
-                } else {
-
-                    binding.favRecyclerView.visibility = View.VISIBLE
-                }
-
+                // Update the favorite count badge in the bottom navigation
                 updateFavoritesBadge(favoriteJobs.size)
             }
         }
@@ -84,21 +79,6 @@ class FavoriteVacanciesFragment : Fragment() {
         val badge = bottomNavigationView.getOrCreateBadge(menuItem.itemId)
         badge.isVisible = favoriteCount > 0
         badge.number = favoriteCount
-    }
-
-    private fun onFavoriteClick(position: Int) {
-        val job = favJobAdapter.jobs[position]
-        sharedViewModel.toggleFavorite(job)
-    }
-
-    private fun onApplyClick(position: Int) {
-        val job = favJobAdapter.jobs[position]
-        Toast.makeText(requireContext(), "Applied for ${job.title} at ${job.company}", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onRemoveFavoriteClick(position: Int) {
-        val job = favJobAdapter.jobs[position]
-        sharedViewModel.removeFavoriteJob(job)
     }
 
     override fun onDestroyView() {

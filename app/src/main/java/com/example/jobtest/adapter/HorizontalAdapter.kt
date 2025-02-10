@@ -25,14 +25,9 @@ class HorizontalAdapter(var offer: List<Offer>,) : RecyclerView.Adapter<Horizont
 
         fun bind(offer: Offer) {
             binding.Titleview.text = offer.title
-            binding.greebutton.text = offer.buttonText ?: "Подробнее"  // Default text if buttonText is null
+            binding.greebutton.text = offer.buttonText ?: "Подробнее"
 
-            binding.link.setOnClickListener {
-                if (offer.link.isNotEmpty()) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(offer.link))
-                    it.context.startActivity(intent)
-                }
-            }
+
         }
     }
 

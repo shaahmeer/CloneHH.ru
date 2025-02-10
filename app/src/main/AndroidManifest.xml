@@ -23,9 +23,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JobTest"
         tools:targetApi="31">
-        <activity
-            android:name=".presentation.ui.Jobdetails"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name=".presentation.ui.MainActivity"

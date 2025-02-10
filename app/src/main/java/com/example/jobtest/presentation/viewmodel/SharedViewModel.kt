@@ -1,5 +1,6 @@
 package com.example.jobtest.presentation.viewmodel
 
+import android.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.core.data.Offer
@@ -11,14 +12,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-
 @HiltViewModel
 class SharedViewModel @Inject constructor(
-    private val offer: com.example.domain.domain.usecase.GetOfferUsecase,
-    private val vacancies: com.example.domain.domain.usecase.GetVacanciesUseCase
+    private val offer: GetOfferUsecase,
+    private val vacancies: GetVacanciesUseCase
 ) : ViewModel() {
 
+    // State Flows for UI
     private val _allJobs = MutableStateFlow<List<Vacancy>>(emptyList())
     val allJobs: StateFlow<List<Vacancy>> = _allJobs.asStateFlow()
 
@@ -34,46 +34,63 @@ class SharedViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // Debounce for search
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    init {
+        observeSearchQuery() // Start observing search query changes
+    }
+
+    // Load Offers
     fun loadOffers() {
         _isLoading.value = true
         viewModelScope.launch {
-            val result = runCatching { offer() }
-            result.onSuccess { data ->
-                _offers.value = data
-            }
-            result.onFailure { exception ->
-                println("Error loading offers: ${exception.message}")
-            }
+            runCatching { offer() }
+                .onSuccess { _offers.value = it }
+                .onFailure { println("Error loading offers: ${it.message}") }
+            _isLoading.value = false
         }
     }
 
+    // Load Vacancies
     fun loadVacancies() {
         _isLoading.value = true
         viewModelScope.launch {
-            val result = runCatching { vacancies() }
-            result.onSuccess { data ->
-                _allJobs.value = data
-                _filteredJobs.value = data
-                updateFavoriteVacancies()
-            }
-            result.onFailure { exception ->
-                println("Error loading vacancies: ${exception.message}")
-            }
+            runCatching { vacancies() }
+                .onSuccess { data ->
+                    _allJobs.value = data
+                    _filteredJobs.value = data
+                    updateFavoriteVacancies()
+                }
+                .onFailure { println("Error loading vacancies: ${it.message}") }
+            _isLoading.value = false
         }
     }
 
-    fun filterJobs(query: String) {
-        val currentJobs = _allJobs.value
-        _filteredJobs.value = if (query.isEmpty()) {
-            currentJobs
-        } else {
-            currentJobs.filter {
-                it.title.contains(query, ignoreCase = true) ||
-                        it.company.contains(query, ignoreCase = true)
+    // Observe Search Query with Debounce
+    private fun observeSearchQuery() {
+        _searchQuery
+            .debounce(300) // 300ms debounce
+            .onEach { query ->
+                _filteredJobs.value = if (query.isEmpty()) {
+                    _allJobs.value
+                } else {
+                    _allJobs.value.filter {
+                        it.title.contains(query, ignoreCase = true) ||
+                                it.company.contains(query, ignoreCase = true)
+                    }
+                }
             }
-        }
+            .launchIn(viewModelScope)
     }
 
+    // Update Search Query
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    // Toggle Favorite
     fun toggleFavorite(vacancy: Vacancy) {
         _allJobs.update { currentVacancies ->
             currentVacancies.map { if (it.id == vacancy.id) it.copy(isFavorite = !it.isFavorite) else it }
@@ -84,11 +101,13 @@ class SharedViewModel @Inject constructor(
         updateFavoriteVacancies()
     }
 
-    fun removeFavoriteJob(vacancy: Vacancy) {
-        if (vacancy.isFavorite) toggleFavorite(vacancy)
-    }
-
+    // Update Favorite Vacancies
     private fun updateFavoriteVacancies() {
         _favoriteVacancies.value = _allJobs.value.filter { it.isFavorite }
+    }
+
+    // Get Favorite Button Color
+    fun getFavoriteColor(vacancy: Vacancy): Int {
+        return if (vacancy.isFavorite) Color.RED else Color.GRAY
     }
 }

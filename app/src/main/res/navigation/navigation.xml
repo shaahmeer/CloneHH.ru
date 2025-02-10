@@ -13,11 +13,23 @@
         <action
             android:id="@+id/action_jobFragment_to_favoriteVacanciesFragment"
             app:destination="@id/favoriteVacanciesFragment" />
+        <action
+            android:id="@+id/action_jobFragment_to_jobDetailsFragment"
+            app:destination="@id/jobDetailsFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/favoriteVacanciesFragment"
         android:name="com.example.jobtest.presentation.ui.FavoriteVacanciesFragment"
         android:label="Favorite Vacancies Fragment"
-        tools:layout="@layout/fragment_favorite_vacancies" />
+        tools:layout="@layout/fragment_favorite_vacancies" >
+        <action
+            android:id="@+id/action_favoriteVacanciesFragment_to_jobDetailsFragment"
+            app:destination="@id/jobDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/jobDetailsFragment"
+        android:name="com.example.jobtest.presentation.ui.JobDetailsFragment"
+        android:label="activity_job_details"
+        tools:layout="@layout/activity_job_details" />
 </navigation>
